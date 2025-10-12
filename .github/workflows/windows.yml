@@ -1,0 +1,81 @@
+name: Windows
+on:
+  push:
+    branches: [ "master" ]
+    paths:
+      - DLLInjector/**
+      - InternetGamesClientDLL/**
+      - InternetGamesServer/**
+  pull_request:
+    branches: [ "master" ]
+    paths:
+      - DLLInjector/**
+      - InternetGamesClientDLL/**
+      - InternetGamesServer/**
+  workflow_dispatch:
+
+jobs:
+  windows:
+    strategy:
+      matrix:
+        arch: [ x64, x86 ]
+        build_type: [ Debug, Release ]
+
+    runs-on: windows-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          submodules: true
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Detect VS 2022 install path
+        id: detect-vs
+        if: matrix.arch == 'x86'
+        shell: pwsh
+        run: |
+          $editions = "Enterprise","Professional","Community"
+          foreach ($edition in $editions) {
+            $path = "C:\Program Files\Microsoft Visual Studio\2022\$edition"
+            if (Test-Path $path) {
+              "VSPath=$path" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+              exit 0
+            }
+          }
+          throw "Visual Studio 2022 installation not found!"
+
+      - name: Install v141_xp toolset and build tools
+        if: matrix.arch == 'x86'
+        shell: cmd
+        run: |
+          set "vsPath=${{ steps.detect-vs.outputs.VSPath }}"
+          set "installer=C:\Program Files (x86)\Microsoft Visual Studio\Installer\vs_installer.exe"
+
+          echo Installing v141_xp toolset and build tools into: %vsPath%.
+          "%installer%" modify ^
+            --installPath "%vsPath%" ^
+            --add Microsoft.VisualStudio.Component.VC.v141.x86.x64 ^
+            --add Microsoft.VisualStudio.Component.WinXP ^
+            --nocache --quiet --norestart
+
+          if %errorlevel% neq 0 (
+            echo Visual Studio component installation failed with error %errorlevel%!
+            exit /b %errorlevel%
+          )
+          echo Visual Studio component installation completed successfully.
+
+      - name: Build
+        env:
+          ARCH: ${{ matrix.arch }}
+          BUILD_TYPE: ${{ matrix.build_type }}
+        run: |
+          msbuild ZoneInternetGamesServer.sln /p:Configuration=$Env:BUILD_TYPE /p:Platform=$Env:ARCH
+
+      - name: Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: "ZoneInternetGamesServer-Windows-${{ matrix.arch }}-${{ matrix.build_type }}-${{ github.sha }}-binaries"
+          path: "${{ (matrix.arch == 'x64' && 'x64/') || '' }}${{ matrix.build_type }}"
