@@ -40,7 +40,7 @@ Those games include:
 For a seamless gaming experience with Windows XP games, you can now use the **Automatic Monitor** which will automatically detect and inject into game instances:
 
 1. Ensure you have the [Internet Games Server](#internet-games-server) running and all required files in the same directory
-2. Run `MSNInstaller.exe`** — this installs the `MonitorApp` along with all necessary files. Once installed, it will run automatically for all future use.
+2. Run `MSNInstaller.exe` — this installs the `MonitorApp` along with all necessary files. Once installed, it will run automatically for all future use.
 3. The monitor will automatically:
    * Detect when you start any zClientm.exe game instances (Checkers, Backgammon, Reversi, etc.)
    * Automatically launch the injector when game windows appear
