@@ -15,27 +15,50 @@ Those games include:
 
 ## Connecting an Internet Game to a hosted Internet Games Server
 
+### Method 1: Manual Injection (Original)
+
 1. Ensure you have access to a hosted [Internet Games Server](#internet-games-server), either on `localhost`, your local network or via the Internet.
 2. From the [latest release of this project](https://github.com/Vankata453/ZoneInternetGamesServer/releases), under "Assets", download the "Release" package for your architecture (x64 or x86).
 3. Extract the downloaded package, containing the [Internet Games Server](#internet-games-server), custom client DLL and injector.
 
 > [!NOTE]
->
 > Ensure the custom client DLL (`InternetGamesClientDLL.dll`) and the injector (`DLLInjector.exe`) are in the same directory!
 
 4. Start an Internet Game of your choice (preferably keep it on the initial info window).
 5. Run `DLLInjector.exe` with a [target game argument](#command-line-arguments-dll-injector) and a dialog to type a host and port to an [Internet Games Server](#internet-games-server) should appear!
 
 > [!WARNING]
->
-> `DLLInjector.exe` is likely to be flagged by antivirus software as a threat, namely Win32/DefenseEvasion.A!ml. That is normal, since DLL Injecting is behaviour
-> commonly used in malware to inject malicious code into other processes.
+> `DLLInjector.exe` is likely to be flagged by antivirus software as a threat, namely Win32/DefenseEvasion.A!ml. That is normal, since DLL Injecting is behaviour commonly used in malware to inject malicious code into other processes.
 >
 > DLL injecting, however, is required for preparing the Internet Games to connect to a custom server. Make sure you add `DLLInjector.exe` as an exception in your antivirus software!
 
 > [!TIP]
->
 > You can create a shortcut to `DLLInjector.exe` with a [target game argument](#command-line-arguments-dll-injector) for ease!
+
+### Method 2: Automatic Injection (NEW for Windows XP!)
+
+For a seamless gaming experience with Windows XP games, you can now use the **Automatic Monitor** which will automatically detect and inject into game instances:
+
+1. Ensure you have the [Internet Games Server](#internet-games-server) running and all required files in the same directory
+2. Run `MSNInstaller.exe`** — this installs the `MonitorApp` along with all necessary files. Once installed, it will run automatically for all future use.
+3. The monitor will automatically:
+   * Detect when you start any zClientm.exe game instances (Checkers, Backgammon, Reversi, etc.)
+   * Automatically launch the injector when game windows appear
+   * Support multiple simultaneous game instances
+   * Continue monitoring for new instances indefinitely
+
+**Features of the Automatic Monitor (XP only):**
+* **Multi-instance Support**: Play Checkers, Backgammon, and Reversi simultaneously
+* **Background Operation**: Runs silently without user interaction
+* **Automatic Detection**: Automatically injects into new game instances as you launch them
+* **Continuous Monitoring**: Handles new game instances automatically
+
+**How it works:**
+* Start `MonitorApp.exe`
+* Launch Internet Checkers → Monitor detects it → Auto-injects DLL
+* Launch Internet Backgammon → Monitor detects it → Auto-injects DLL
+* Launch Internet Reversi → Monitor detects it → Auto-injects DLL
+* Each new game instance is automatically handled!
 
 ## Includes
 
@@ -45,12 +68,9 @@ This repository includes, or will include, the following:
 
 ![Preview of the Internet Games Server in action](docs/img/README_ServerPreview.png)
 
-A Winsock server, which aims to make the Internet Games playable by acting as a Zone games server.
-It matches players in lobbies, depending on the game being played, as well as the chosen skill level.
-It can manage many matches of any of the games at the same time.
+A Winsock server, which aims to make the Internet Games playable by acting as a Zone games server. It matches players in lobbies, depending on the game being played, as well as the chosen skill level. It can manage many matches of any of the games at the same time.
 
-Each game has custom messages, which need to be supported by the server in order for it to function properly.
-The current progress on individual game support is the following:
+Each game has custom messages, which need to be supported by the server in order for it to function properly. The current progress on individual game support is the following:
 
 #### Internet Backgammon (Windows 7)
 
@@ -65,10 +85,7 @@ Fully supported, according to my testing.
 ![Internet Checkers (7)](docs/img/README_CheckersPreview.png)
 
 > [!NOTE]
->
-> For Internet Checkers, the server doesn't know when a game has finished with a win,
-> so that leads to the drawback of causing an "Error communicating with server" message
-> after a game has finished with a win (even though since the game has ended anyway, it's not really important).
+> For Internet Checkers, the server doesn't know when a game has finished with a win, so that leads to the drawback of causing an "Error communicating with server" message after a game has finished with a win (even though since the game has ended anyway, it's not really important).
 
 #### Internet Spades (Windows 7)
 
@@ -102,28 +119,22 @@ Fully supported, according to my testing.
 
 ![Internet Reversi (XP)](docs/img/README_ReversiXPPreview.png)
 
-
 > [!NOTE]
->
 > For all games, no matter supported or not, there are differences from original server behaviour:
 >
 > * **If an opponent leaves the game, instead of replacing them with an AI player, the server ends the game.**
 >
->   The reason for this is that AI player logic has originally been developed server-side.
->   Since this server does not support game logic, they cannot be supported, hence the match is ended
->   by disconnecting all players, causing "Error communicating with server" and "Your opponent has left the game"
->   error messages on Windows 7 and XP game clients respectively.
+>   The reason for this is that AI player logic has originally been developed server-side. Since this server does not support game logic, they cannot be supported, hence the match is ended by disconnecting all players, causing "Error communicating with server" and "Your opponent has left the game" error messages on Windows 7 and XP game clients respectively.
 >
 > * **Since the server does not support game logic, it will send over any valid event messages, regardless of their legitimacy.**
 >
->   If a player were to modify event messages being sent to the server to try and cheat, it's up to the opponents' game clients to determine whether the actions are legitimate or not.
->   Luckily, from my testing, this local validation seems to work nicely. On invalid data, the game ends with a "Corrupted data" message.
+>   If a player were to modify event messages being sent to the server to try and cheat, it's up to the opponents' game clients to determine whether the actions are legitimate or not. Luckily, from my testing, this local validation seems to work nicely. On invalid data, the game ends with a "Corrupted data" message.
 
 #### Command line arguments
 
 * `-p` (`--port`): Port to host the server on. *Default: 80*
 * `-l` (`--log`): Enables socket data logging. Allows for specifying a custom folder; if not specified, the *default "InternetGamesServer_logs"* folder is used.
-* `--skip-level-matching`: Allows matching players, disregarding their chosen skill level. 
+* `--skip-level-matching`: Allows matching players, disregarding their chosen skill level.
 * `--log-ping-messages`: Log empty received messages by sockets, which are used for pinging the server.
 * `--disable-xp-ad-banner`: Prevents the server from responding to ad banner requests from XP games. By default, a "Powered by ZoneInternetGamesServer" banner is provided.
 
@@ -154,6 +165,19 @@ The Windows XP Client DLL performs the following operations:
   * `-x` (`--xp`): For injecting the client DLL into any Windows XP game **(x86 only!)**.
 * `-r` (`--repeat`): See [Using DLL Injector on multiple instances](#using-dll-injector-on-multiple-instances). *Default: 0*
 
+### Automatic Monitor (NEW for Windows XP!)
+
+The MonitorApp provides automatic injection capabilities for Windows XP games:
+
+* **Background Operation**: Runs silently without user intervention
+* **Multi-instance Support**: Automatically handles multiple simultaneous game instances
+* **Automatic Detection**: Injects into game instances as they are launched
+* **Continuous Monitoring**: Watches for new game instances indefinitely
+
+#### Usage
+
+Simply run `MonitorApp.exe` and it will automatically handle all game injection for Windows XP games. No command-line arguments needed!
+
 ## Building
 
 To build any of the projects, open up the respective project file (.vcxproj) in Visual Studio and build from there.
@@ -164,10 +188,13 @@ For information on how to run multiple instances of any of the Internet Games, [
 
 #### Using DLL Injector on multiple instances
 
-To use the DLL Injector on multiple instances at the same time, provide the `-r` (or `--repeat`) argument to it,
-allowing to skip a select number of previously started processes of the specified Internet Game.
-For example, to inject the DLL into a second instance of the same game, provide `-r 1` (or `--repeat 1`).
+To use the DLL Injector on multiple instances at the same time, provide the `-r` (or `--repeat`) argument to it, allowing to skip a select number of previously started processes of the specified Internet Game. For example, to inject the DLL into a second instance of the same game, provide `-r 1` (or `--repeat 1`).
+
+**Alternatively**, for Windows XP games, use the new **Automatic Monitor** which handles multiple instances automatically without any configuration!
 
 ## Credits
 
 * [codereversing.com](https://www.codereversing.com/archives/138) for providing some logs and tons of helpful information, regarding reverse-engineering the Internet Games.
+* [Vankata453](https://github.com/Vankata453/ZoneInternetGamesServer) the owner of the project, for his great efforts to revive MSN Zone games.
+---
+
