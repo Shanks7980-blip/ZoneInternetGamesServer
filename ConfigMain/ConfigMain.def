@@ -1,0 +1,8 @@
+LIBRARY "ConfigMain"
+EXPORTS
+    InitializeTrayIcon
+    ShowTrayIcon
+    HideTrayIcon
+    UpdateTrayConfig
+    GetCurrentConfig
+    CleanupTrayIcon
