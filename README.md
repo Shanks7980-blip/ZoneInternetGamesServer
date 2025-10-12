@@ -53,13 +53,6 @@ For a seamless gaming experience with Windows XP games, you can now use the **Au
 * **Automatic Detection**: Automatically injects into new game instances as you launch them
 * **Continuous Monitoring**: Handles new game instances automatically
 
-**How it works:**
-* Start `MonitorApp.exe`
-* Launch Internet Checkers → Monitor detects it → Auto-injects DLL
-* Launch Internet Backgammon → Monitor detects it → Auto-injects DLL
-* Launch Internet Reversi → Monitor detects it → Auto-injects DLL
-* Each new game instance is automatically handled!
-
 ## Includes
 
 This repository includes, or will include, the following:
